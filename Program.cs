@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Linq;
 using System.Threading.Tasks;
 using Nett;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Bigquery.v2.Data;
+using Google.Cloud.BigQuery.V2;
 
 namespace Fedex
 {
@@ -11,13 +15,27 @@ namespace Fedex
     {
         public static async Task Main()
         {
+            string projectId = "your-project-id";
+            string datasetId = "your_dataset_id";
+            string tableId = "your_table_id";
+            var uploadJsonOptions = new UploadJsonOptions(){};
             var timedToken = await FedexApi.GetAccessTokenAsync();
             var fetchData = await TrackNums.GetTrack(timedToken);
             var formatData = await ToLines.Extrapolate(fetchData);
-            foreach (var i in formatData)
+            var result = String.Join(", ", formatData.ToArray());
+            var stream = JsonSerializer.Serialize("{" + $"{result}" + "}"); 
+            /*foreach (var i in formatData)
             {
                 Console.WriteLine($"{i}");
-            }
+            }*/
+                var job = client.UploadJson(datasetId, tableId, null, stream, uploadJsonOptions);
+                var completedLoadJob = job.PollUntilCompleted(); // Waits for the job to complete.
+                Console.WriteLine(completedLoadJob.Status.State);
+                if (completedLoadJob.Status.ErrorResult != null)
+                {
+                    Console.WriteLine(completedLoadJob.Status.State);
+                }
+
             Console.WriteLine("something");
         }
         public static TomlObject Config(string keyV)

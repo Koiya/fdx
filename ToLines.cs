@@ -34,15 +34,15 @@ namespace Fedex
             var delData3 = dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ActualDeliveryAddress?.PostalCode;
             var delData = string.Concat(delData1, "|", delData2, "|", delData3);
             //stringBuild
-            stuShip.Add($"('tracking_num' , '{dataIn[0]?.TrackingNumber}')");
+            stuShip.Add($"'tracking_num' : '{dataIn[0]?.TrackingNumber}'");
             //stuShip.Add();
-            stuShip.Add($"('destination_data' , '{desData}')");
-            stuShip.Add($"('status' , '{dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description}')");
-            stuShip.Add($"('latest_details' , '{dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription}')");
-            stuShip.Add($"('latest_scan' , '{scanData}'");
-            stuShip.Add($"('delivery_attempt_info' , '{dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts}')"); 
-            stuShip.Add($"('received_by' , '{dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName}')");
-            stuShip.Add($"('delivered_data' , '{delData}')");
+            stuShip.Add($"'destination_data' : '{desData}'");
+            stuShip.Add($"'status' : '{dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description}'");
+            stuShip.Add($"'latest_details' : '{dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription}'");
+            stuShip.Add($"'latest_scan' : '{scanData}'");
+            stuShip.Add($"'delivery_attempt_info' : '{dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts}'"); 
+            stuShip.Add($"'received_by' : '{dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName}'");
+            stuShip.Add($"'delivered_data' : '{delData}'");
 
             return Task.FromResult(stuShip);
         }
