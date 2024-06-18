@@ -24,10 +24,11 @@ namespace Fedex
             var formatData = await ToLines.Extrapolate(fetchData);
             var result = String.Join(", ", formatData.ToArray());
             var stream = JsonSerializer.Serialize("{" + $"{result}" + "}"); 
+            
             /*foreach (var i in formatData)
             {
                 Console.WriteLine($"{i}");
-            }*/
+            }
                 var job = client.UploadJson(datasetId, tableId, null, stream, uploadJsonOptions);
                 var completedLoadJob = job.PollUntilCompleted(); // Waits for the job to complete.
                 Console.WriteLine(completedLoadJob.Status.State);
@@ -35,7 +36,7 @@ namespace Fedex
                 {
                     Console.WriteLine(completedLoadJob.Status.State);
                 }
-
+            */
             Console.WriteLine("something");
         }
         public static TomlObject Config(string keyV)
