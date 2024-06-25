@@ -9,11 +9,10 @@ namespace Fedex
     {
         public static Task<List<string>> Extrapolate(
             List<CompleteTrackResult> dataIn,
-            string projectId = "your-project-id",
-            string datasetId = "your_dataset_id",
-            string table = "your_table_id")
+            string projectId,
+            string datasetId,
+            string table)
         {
-            //BigQueryClient client = BigQueryClient.Create(projectId);
             var stuShip = new List<string>();
             //destination
             var desData1 = dataIn[0].TrackResults[0]?.RecipientInformation?.Contact?.PersonName;
@@ -40,19 +39,29 @@ namespace Fedex
             var delData3 = dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ActualDeliveryAddress?.PostalCode;
             var delData = string.Concat(delData1, "|", delData2, "|", delData3);
             //Insert into Big Query Row
-            table.InsertRow(new BigQueryInsertRow {
-                { "tracking_num", dataIn[0]?.TrackingNumber },
-                { "destination_data" ,desData },
-                {"status" ,dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description},
-                {"latest_details" ,dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription},
-                {"latest_scan" ,scanData},
-                {"delivery_attempt_info" ,dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts},
-                {"received_by" ,dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName},
-                {"delivered_data" ,delData}
-            });
+            try
+            {
+                table.InsertRow(new BigQueryInsertRow
+                {
+                    { "tracking_num", dataIn[0]?.TrackingNumber },
+                    { "destination_data", desData },
+                    { "status", dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description },
+                    {
+                        "latest_details",
+                        dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription
+                    },
+                    { "latest_scan", scanData },
+                    { "delivery_attempt_info", dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts },
+                    { "received_by", dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName },
+                    { "delivered_data", delData }
+                });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
             //stringBuild
             stuShip.Add($"'tracking_num' : '{dataIn[0]?.TrackingNumber}'");
-            //stuShip.Add();
             stuShip.Add($"'destination_data' : '{desData}'");
             stuShip.Add($"'status' : '{dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description}'");
             stuShip.Add($"'latest_details' : '{dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription}'");
@@ -60,7 +69,6 @@ namespace Fedex
             stuShip.Add($"'delivery_attempt_info' : '{dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts}'"); 
             stuShip.Add($"'received_by' : '{dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName}'");
             stuShip.Add($"'delivered_data' : '{delData}'");
-
             return Task.FromResult(stuShip);
         }
     }

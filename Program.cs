@@ -17,26 +17,15 @@ namespace Fedex
         {
             string projectId = "your-project-id";
             string datasetId = "your_dataset_id";
-            string tableId = "your_table_id";
+            string table = "your_table_id";
             var uploadJsonOptions = new UploadJsonOptions(){};
             var timedToken = await FedexApi.GetAccessTokenAsync();
             var fetchData = await TrackNums.GetTrack(timedToken);
-            var formatData = await ToLines.Extrapolate(fetchData);
-            var result = String.Join(", ", formatData.ToArray());
-            var stream = JsonSerializer.Serialize("{" + $"{result}" + "}"); 
-            
-            /*foreach (var i in formatData)
+            var formatData = await ToLines.Extrapolate(fetchData, projectId,datasetId,table);
+            foreach (var i in formatData)
             {
                 Console.WriteLine($"{i}");
             }
-                var job = client.UploadJson(datasetId, tableId, null, stream, uploadJsonOptions);
-                var completedLoadJob = job.PollUntilCompleted(); // Waits for the job to complete.
-                Console.WriteLine(completedLoadJob.Status.State);
-                if (completedLoadJob.Status.ErrorResult != null)
-                {
-                    Console.WriteLine(completedLoadJob.Status.State);
-                }
-            */
             Console.WriteLine("something");
         }
         public static TomlObject Config(string keyV)
