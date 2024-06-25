@@ -11,9 +11,9 @@ namespace Fedex
             List<CompleteTrackResult> dataIn,
             string projectId = "your-project-id",
             string datasetId = "your_dataset_id",
-            string tableId = "your_table_id")
+            string table = "your_table_id")
         {
-            BigQueryClient client = BigQueryClient.Create(projectId);
+            //BigQueryClient client = BigQueryClient.Create(projectId);
             var stuShip = new List<string>();
             //destination
             var desData1 = dataIn[0].TrackResults[0]?.RecipientInformation?.Contact?.PersonName;
@@ -40,16 +40,16 @@ namespace Fedex
             var delData3 = dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ActualDeliveryAddress?.PostalCode;
             var delData = string.Concat(delData1, "|", delData2, "|", delData3);
             //Insert into Big Query Row
-            BigQueryInsertRow insertRow = new BigQueryInsertRow();
-            insertRow.Add("tracking_num", dataIn[0]?.TrackingNumber);
-            insertRow.Add("destination_data" ,desData);
-            insertRow.Add("status" ,dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description);
-            insertRow.Add("latest_details" ,dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription);
-            insertRow.Add("latest_scan" ,scanData);
-            insertRow.Add("delivery_attempt_info" ,dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts); 
-            insertRow.Add("received_by" ,dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName);
-            insertRow.Add("delivered_data" ,delData);
-            client.InsertRows(datasetId, tableId, insertRow);
+            table.InsertRow(new BigQueryInsertRow {
+                { "tracking_num", dataIn[0]?.TrackingNumber },
+                { "destination_data" ,desData },
+                {"status" ,dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.Description},
+                {"latest_details" ,dataIn[0]?.TrackResults[0]?.LatestStatusDetail?.AncillaryDetails[0].ReasonDescription},
+                {"latest_scan" ,scanData},
+                {"delivery_attempt_info" ,dataIn[0]?.TrackResults[0]?.DeliveryDetails.DeliveryAttempts},
+                {"received_by" ,dataIn[0]?.TrackResults[0]?.DeliveryDetails?.ReceivedByName},
+                {"delivered_data" ,delData}
+            });
             //stringBuild
             stuShip.Add($"'tracking_num' : '{dataIn[0]?.TrackingNumber}'");
             //stuShip.Add();
